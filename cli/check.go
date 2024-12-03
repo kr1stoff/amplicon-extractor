@@ -1,13 +1,12 @@
-package check
+package cli
 
 import (
-	"fmt"
 	"os"
 	"strings"
 )
 
 // 检查引物序列是否只包含ACGT
-func IsWrongPrimer(primer string) bool {
+func isWrongPrimer(primer string) bool {
 	// 支持简并
 	allowed := "ATCGRYSWKMBDHVNatucgryswkmbdhvn"
 
@@ -20,23 +19,17 @@ func IsWrongPrimer(primer string) bool {
 }
 
 // 检查输入 fasta 文件是否存在
-func IsNotExistFile(file string) bool {
+func isNotExistFile(file string) bool {
 	open, err := os.Open(file)
 
 	// 不能打开
 	if err != nil {
-		fmt.Println(err)
 		return true
 	}
-
 	defer open.Close()
-	stream := make([]byte, 0)
-	_, err2 := open.Read(stream[:])
 
 	// 不能读取
-	if err2 != nil {
-		fmt.Println(err2)
-		return true
-	}
-	return false
+	stream := make([]byte, 0)
+	_, err2 := open.Read(stream[:])
+	return err2 != nil
 }

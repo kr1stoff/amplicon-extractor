@@ -1,19 +1,20 @@
 package extract
 
 import (
+	myio "amplicon-extractor/io"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/agnivade/levenshtein"
+	"github.com/biogo/biogo/alphabet"
+	"github.com/biogo/biogo/io/seqio"
+	"github.com/biogo/biogo/io/seqio/fasta"
+	"github.com/biogo/biogo/seq/linear"
 )
 
-func TestCalcHammingDistance(t *testing.T) {
-	fmt.Fprintln(os.Stdout, levenshtein.ComputeDistance("AGCT", "AGTC"))
-}
-
-func TestGetPrimerPositionOnGenome(t *testing.T) {
-	genomeSequence := `
+var genomeSequence = `
 	GTGAATGAAGATGGCGTCTAACGACGCTTCCGCTGCCGTTGCTGGCAAAAACAACAACAACGACAAGGAAAAATCTTCAA
 	GTGACAGCTTGTTTGCTAACATGTCTGTCACTTTTAAGAAAGCCCTCGGGGCGCGGTCTAAACAACCGCCCCCGGGAGAA
 	ACAAAACAAATACAAAAACCACCAAGGCCACCGACACCGGAATTGGTGAAGAGAATACCTCCACCCCCACCCAATGGCGA
@@ -109,10 +110,43 @@ func TestGetPrimerPositionOnGenome(t *testing.T) {
 	TCAAGTAGGGCTTCCAGTTCTGGGACGGTCTCGACCGTGCCCAAGGAAGTTTTGGACTCCTGGACGTCTGCGTTTAACAC
 	ACACAGACAGCCGCTCTTCGCACACCTCAGAGTGAGGGGGGAGTCACGTGTTTAGTGAAAAGAAATAATTGGCTATAATG
 	TGATTTCTTTCTAATTTTGGCTAATTTGTATCTTTT`
+
+func TestCalcHammingDistance(t *testing.T) {
+	fmt.Fprintln(os.Stdout, levenshtein.ComputeDistance("AGCT", "AGTC"))
+}
+
+func TestGetPrimerPositionOnGenome(t *testing.T) {
 	// 测试用例
 	positionsF1 := getPrimerPositionOnGenome("CARGARBCNATGTTYAGRTGGATGAG", genomeSequence, 2, 'F')
 	positionsF2 := getPrimerPositionOnGenome("CNTGGGAGGGCGATCGCAA", genomeSequence, 2, 'F')
 	positionsR1 := getPrimerPositionOnGenome("CCRCCNGCATRHCCRTTRTACAT", genomeSequence, 2, 'R')
 
 	fmt.Fprintln(os.Stdout, positionsF1, positionsF2, positionsR1)
+}
+
+func TestLinearSeq(t *testing.T) {
+	content := myio.OpenFileToString("E:\\xiangfu.meng\\Software\\mygo\\src\\amplicon-extractor\\test\\template.fna")
+	// ! 测试有 30s 时间显示, 如果超时就需要优化了
+	// content := openFileToString("E:\\xiangfu.meng\\2024\\学科-感染\\KML241122_NV_sanger\\work\\GII_genomes_fasta\\GII.all.fna")
+	data := strings.NewReader(content)
+	template := linear.NewSeq("", nil, alphabet.DNAredundant)
+	r := fasta.NewReader(data, template)
+	sc := seqio.NewScanner(r)
+	for sc.Next() {
+		s := sc.Seq().(*linear.Seq)
+		ampliconArray := getShortestAmplicon("CARGARBCNATGTTYAGRTGGATGAG", "CCRCCNGCATRHCCRTTRTACAT", 2, *s)
+		if ampliconArray[0] != "" {
+			fmt.Fprintln(os.Stdout, ampliconArray)
+		}
+	}
+}
+
+func TestExtract(t *testing.T) {
+	finalAmplicons := Extract("E:\\xiangfu.meng\\Software\\mygo\\src\\amplicon-extractor\\test\\template.fna", "CARGARBCNATGTTYAGRTGGATGAG", "CCRCCNGCATRHCCRTTRTACAT", 2, 8)
+	fmt.Fprintln(os.Stdout, finalAmplicons)
+}
+
+func TestExtractMultithread(t *testing.T) {
+	finalAmplicons := ExtractMultithread("E:\\xiangfu.meng\\Software\\mygo\\src\\amplicon-extractor\\test\\template100.fna", "CARGARBCNATGTTYAGRTGGATGAG", "CCRCCNGCATRHCCRTTRTACAT", 2, 8)
+	fmt.Fprintln(os.Stdout, finalAmplicons)
 }

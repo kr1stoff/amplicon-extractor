@@ -1,12 +1,12 @@
 package extract
 
 /*
-expandDegenerateBases 将一个简并的 DNA 序列扩展为所有可能的序列
-Args:
+@description: expandDegenerateBases 将一个简并的 DNA 序列扩展为所有可能的序列
+@param:
 
 	sequence: 需要扩展的简并的 DNA 序列
 
-Returns:
+@return:
 
 	[]string: 包含所有可能的序列的切片
 */
@@ -28,12 +28,12 @@ func ExpandDegenerateBases(sequence string) []string {
 	var expand func(seq string, idx int, current []string) []string
 
 	/*
-		expand 函数用于递归地扩展简并碱基, 生成所有可能的序列
-		Args:
+		@description: expand 函数用于递归地扩展简并碱基, 生成所有可能的序列
+		@param:
 			seq: 需要扩展的简并的 DNA 序列
 			idx: 当前处理的索引位置
 			current: 当前已生成的序列切片
-		Returns:
+		@return:
 			[]string: 包含所有可能的序列的切片
 	*/
 	expand = func(seq string, idx int, current []string) []string {
