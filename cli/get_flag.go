@@ -13,6 +13,7 @@ type CommandLineArgs struct {
 	MaxMismatch int
 	Threads     int
 	Fasta       string
+	OutFile     string
 }
 
 func GetFlag() CommandLineArgs {
@@ -23,7 +24,8 @@ func GetFlag() CommandLineArgs {
 	flag.StringVar(&args.Reverse, "r", "none", "下游引物序列.")
 	flag.IntVar(&args.MaxMismatch, "m", 3, "最大允许的错配数.")
 	flag.IntVar(&args.Threads, "j", 1, "线程数.")
-	flag.StringVar(&args.Reverse, "F", "none", "输入基因组 fasta 文件.")
+	flag.StringVar(&args.Fasta, "F", "none", "输入基因组 fasta 文件.")
+	flag.StringVar(&args.OutFile, "o", "out.fasta", "输出 fasta 文件.")
 
 	flag.Parse()
 	fmt.Println("Forward: ", args.Forward)
@@ -31,6 +33,7 @@ func GetFlag() CommandLineArgs {
 	fmt.Printf("MaxMismatch: %d\n", args.MaxMismatch)
 	fmt.Printf("Threads: %d\n", args.Threads)
 	fmt.Println("Fasta: ", args.Fasta)
+	fmt.Println("OutFile: ", args.OutFile)
 
 	if args.Forward == "none" || args.Reverse == "none" || isWrongPrimer(args.Forward) || isWrongPrimer(args.Reverse) {
 		fmt.Print("Error: 请输入正确的上游引物和下游引物!\n\n")
