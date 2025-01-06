@@ -137,7 +137,8 @@ func getShortestAmplicon(forward string, reverse string, maxMismatch int, s line
 				// * 通过
 				if ampliconLength >= minAmpliconLength && ampliconLength <= maxAmpliconLength {
 					// 提取扩增子序列
-					matchAmplicons[ampliconLength] = [2]string{s.ID, s.Seq.String()[forwardPosition:reversePosition]}
+					// ! 实际都往左偏移了一个位置
+					matchAmplicons[ampliconLength] = [2]string{s.ID, s.Seq.String()[(forwardPosition + 1):(reversePosition + 1)]}
 				}
 			}
 
